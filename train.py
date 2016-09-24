@@ -1,19 +1,9 @@
-import csv
-import pandas as pd
+import pickle
 
 def load_data(datasets):
 
-    frames = []
-
-    for dataset_path in datasets:
-        with open(dataset_path, newline='', encoding='utf-8') as fp:
-            reader = csv.reader(fp, delimiter=',')
-            rows = [x[:1] + [','.join(x[1:-2])] + x[-2:] for x in reader]
-            dataset = pd.DataFrame(rows)
-            frames.append(dataset)
-
-    # concatenate data frames into a single one
-    data = pd.concat(frames)
+    with open('data.pickle', 'rb') as f:
+        data = pickle.load(f)
 
     return data
 
@@ -30,9 +20,7 @@ def main():
 
     data = load_data(datasets)
 
-    print(data.shape)
-
-    print(data.as_matrix())
+    print(len(data.keys()))
 
 if __name__ == '__main__':
     main()
