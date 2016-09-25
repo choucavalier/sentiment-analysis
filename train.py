@@ -71,5 +71,10 @@ def main():
     print(metrics.classification_report(expected, predicted))
     print(metrics.confusion_matrix(expected, predicted))
 
+    with open('model.pickle', 'wb') as f:
+        pickle.dump(model, f)
+
+    print('model saved in model.pickle')
+
 if __name__ == '__main__':
     main()

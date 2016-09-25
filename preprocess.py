@@ -14,7 +14,6 @@ def tokenize_tweet(tknzr, stopwords, tweet: str):
 
 def main():
 
-    # tknzr = nltk.tokenize.TweetTokenizer(strip_handles=True, reduce_len=True)
     tknzr = nltk.tokenize.RegexpTokenizer(r'\w+')
 
     stopwords = set(nltk.corpus.stopwords.words('english'))
@@ -60,7 +59,6 @@ def main():
         features = np.zeros(len(vocabulary), dtype=np.bool)
         for i, token in enumerate(vocabulary):
             if token in tokens:
-                # print(token, 'in tweet')
                 features[i] = True
         data.append((features, label))
 
