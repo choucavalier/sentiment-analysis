@@ -1,10 +1,23 @@
 import pickle
 
+import numpy as np
 import nltk
+
+def tokenize_tweet(tknzr, stopwords, tweet: str):
+    tweet = tweet.replace('\n', '').strip('"').rstrip('"')
+    tweet = tweet.lower()
+    tokens = set(tknzr.tokenize(tweet)) - stopwords
+    for token in list(tokens):
+        if token.startswith('http'):
+            tokens.remove(token)
+    return tokens
 
 def main():
 
-    tknzr = nltk.tokenize.TweetTokenizer(strip_handles=True, reduce_len=True)
+    # tknzr = nltk.tokenize.TweetTokenizer(strip_handles=True, reduce_len=True)
+    tknzr = nltk.tokenize.RegexpTokenizer(r'\w+')
+
+    stopwords = set(nltk.corpus.stopwords.words('english'))
 
     datasets = [
         'raw_data/train/train_airlines.csv',
@@ -16,37 +29,39 @@ def main():
     ]
 
     data_tokens = []
-
-    all_tokens = set()
+    all_tokens = []
 
     for dataset_path in datasets:
         with open(dataset_path, encoding='utf-8') as raw_file:
-            with open(dataset_path.replace('raw', 'preprocessed'), 'w',
-                      encoding='utf-8') as preprocessed_file:
-                buffer = u''
-                for line in raw_file.readlines():
-                    if len(buffer) > 0:
-                        line = buffer + line
-                    try:
-                        tweet, label = line.rsplit(',', 1)
-                        label = label.rstrip('\n')
-                        tweet = tweet.replace('\n', '').strip('"').rstrip('"')
-                        tweet = tweet.lower()
-                        tokens = set(tknzr.tokenize(tweet.encode('utf-8')))
-                        for token in tokens:
-                            all_tokens.add(token)
-                        data_tokens.append((tokens, label))
-                    except ValueError:
-                        buffer = line
+            buffer = u''
+            for line in raw_file.readlines():
+                if len(buffer) > 0:
+                    line = buffer + line
+                try:
+                    tweet, label = line.rsplit(',', 1)
+                    buffer = ''
+                    label = label.rstrip('\n')
+                    tokens = tokenize_tweet(tknzr, stopwords, tweet)
+                    data_tokens.append((tokens, label))
+                    all_tokens += tokens
+                except ValueError:
+                    buffer = line
 
-    all_tokens = list(nltk.FreqDist(token for token in all_tokens))[:2000]
+    dist = nltk.FreqDist(all_tokens)
+
+    vocabulary = list([w for w, f in dist.most_common(2000)])
+
+    with open('vocabulary.pickle', 'wb') as f:
+        pickle.dump(vocabulary, f)
 
     data = []
 
     for tokens, label in data_tokens:
-        features = {}
-        for token in all_tokens:
-            features['contains({})'.format(token)] = (token in tokens)
+        features = np.zeros(len(vocabulary), dtype=np.bool)
+        for i, token in enumerate(vocabulary):
+            if token in tokens:
+                # print(token, 'in tweet')
+                features[i] = True
         data.append((features, label))
 
     with open('data.pickle', 'wb') as f:
