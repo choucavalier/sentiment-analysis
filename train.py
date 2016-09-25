@@ -63,18 +63,36 @@ def main():
 
     model = naive_bayes.MultinomialNB()
 
+    print('... training model')
+    print(x_train.shape[0], 'samples used for training')
+
     model.fit(x_train, y_train)
+
+    print('model {} trained'.format(model.__class__.__name__))
+
+    print('... evaluating model')
+    print(x_test.shape[0], 'samples used for testing')
 
     expected = y_test
     predicted = model.predict(x_test)
 
+    print('.' * 70)
+
+    print('classification report')
+
     print(metrics.classification_report(expected, predicted))
+
+    print('.' * 70)
+
+    print('confusion matrix')
     print(metrics.confusion_matrix(expected, predicted))
+
+    print('.' * 70)
 
     with open('model.pickle', 'wb') as f:
         pickle.dump(model, f)
 
-    print('model saved in model.pickle')
+    print('model saved in', './model.pickle')
 
 if __name__ == '__main__':
     main()

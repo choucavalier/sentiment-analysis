@@ -18,6 +18,8 @@ import pickle
 import numpy as np
 import nltk
 
+VOCABULARY_SIZE = 2000
+
 def tokenize_tweet(tknzr, stopwords, tweet: str):
     tweet = tweet.replace('\n', '').strip('"').rstrip('"')
     tweet = tweet.lower()
@@ -42,6 +44,8 @@ def main():
         'raw_data/test/test_apple.csv',
         'raw_data/test/test_products.csv',
     ]
+
+    print('... generating vocabulary')
 
     # all filtered tokens appearing in the dataset (with repetition)
     all_tokens = []
@@ -68,15 +72,23 @@ def main():
                 except ValueError:
                     buffer = line
 
+    print('totally', len(all_tokens), 'tokens of interest in the corpus')
+
     # calculate frequency of each token in the corpus
     dist = nltk.FreqDist(all_tokens)
 
     # most common tokens in the corpus
-    vocabulary = list([w for w, f in dist.most_common(2000)])
+    vocabulary = list([w for w, f in dist.most_common(VOCABULARY_SIZE)])
+
+    print('vocabulary size:', VOCABULARY_SIZE)
+    print('10 most common words:', list([w for w, f in dist.most_common(10)]))
 
     # persist vocabulary (feature set)
     with open('vocabulary.pickle', 'wb') as f:
         pickle.dump(vocabulary, f)
+        print('vocabulary saved in', './vocalubary.pickle')
+
+    print('... extracting features')
 
     # (features, label) for each datum
     data = []
@@ -92,6 +104,8 @@ def main():
     # persist preprocessed dataset ((features, label))
     with open('data.pickle', 'wb') as f:
         pickle.dump(data, f)
+
+    print('preprocessed data saved in', './data.pickle')
 
 if __name__ == '__main__':
     main()
