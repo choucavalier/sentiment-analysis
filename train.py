@@ -1,83 +1,79 @@
+'''Train the model on preprocessed data
+
+This module:
+
+1.  generates a model trained on preprocessed data
+
+2.  evaluates the model using 10-fold cross validation
+'''
 import enum
 import pickle
 import random
 
 import numpy as np
+from sklearn import cross_validation
 from sklearn import naive_bayes
 from sklearn import metrics
 
-label_to_int = {
-    'neutral': 0,
-    'positive': 1,
-    'negative': 2,
-}
-
-int_to_label = {
-    0: 'neutral',
-    1: 'positive',
-    2: 'negative',
-}
 
 def main():
 
-    datasets = [
-        'data/train/train_airlines.csv',
-        'data/train/train_apple.csv',
-        'data/train/train_products.csv',
-        'data/test/test_airlines.csv',
-        'data/test/test_apple.csv',
-        'data/test/test_products.csv',
-    ]
+    # dict used to convert string labels to integers
+    label_to_int = {
+        'neutral': 0,
+        'positive': 1,
+        'negative': 2,
+    }
 
-    with open('vocabulary.pickle', 'rb') as f:
-        vocabulary = pickle.load(f)
-
+    # load the preprocessed data (see preprocess.py)
     with open('data.pickle', 'rb') as f:
         data = pickle.load(f)
 
     cleaned_data = []
 
-    for features, label in data:
-        if label in label_to_int:
-            cleaned_data.append((features, label))
+    # shuffling the data
+    random.shuffle(data)
 
-    random.shuffle(cleaned_data)
+    n_samples = len(data)
+    n_features = data[0][0].shape[0]
 
-    n_samples = len(cleaned_data)
-    n_features = len(vocabulary)
-
+    # create ndarrays from preprocessed data
     x = np.ndarray(shape=(n_samples, n_features))
     y = np.ndarray(shape=(n_samples,), dtype=int)
-
-    for i, datum in enumerate(cleaned_data):
+    for i, datum in enumerate(data):
         x[i] = datum[0]
         y[i] = label_to_int[datum[1]]
 
+    # splitting the dataset into train/test
     n_training_samples = 2 * n_samples // 3
-
     x_train = x[:n_training_samples]
     y_train = y[:n_training_samples]
-
     x_test = x[n_training_samples:]
     y_test = y[n_training_samples:]
 
     # hardcoded prior probabilities
-    priors = np.array([0.4, 0.3, 0.3])
+    priors = np.array([0.5, 0.25, 0.25])
 
     model = naive_bayes.MultinomialNB(class_prior=priors)
 
-    print('... training model')
-    print(x_train.shape[0], 'samples used for training')
+    print(x_train.shape[0], 'samples used for training/validation')
+
+    print('... fitting model')
 
     model.fit(x_train, y_train)
 
-    print('model {} trained'.format(model.__class__.__name__))
+    print('done')
 
-    print('... evaluating model')
+    print('... cross validition')
+
+    scores = cross_validation.cross_val_score(model, x_train, y_train, cv=10)
+    print('accuracy: {} (+/- {})'.format(scores.mean(), scores.std() * 2))
+
+    print('... testing model')
     print(x_test.shape[0], 'samples used for testing')
 
     expected = y_test
-    predicted = model.predict(x_test)
+    predicted = cross_validation.cross_val_predict(model, x_test, y_test, cv=10)
 
     print('.' * 70)
 

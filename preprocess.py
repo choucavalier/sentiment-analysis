@@ -1,4 +1,4 @@
-'''Preprocessing module
+'''Preprocess the data and generate a vocabulary
 
 This module:
 
@@ -18,7 +18,7 @@ import pickle
 import numpy as np
 import nltk
 
-VOCABULARY_SIZE = 2000
+VOCABULARY_SIZE = 4000
 
 def tokenize_tweet(tknzr, stopwords, tweet: str):
     tweet = tweet.replace('\n', '').strip('"').rstrip('"')
@@ -63,14 +63,17 @@ def main():
                 try:
                     # attempt to split the tweet and label
                     tweet, label = line.rsplit(',', 1)
-                    buffer = ''
                     label = label.rstrip('\n')
+                    if label not in set(['negative', 'neutral', 'positive']):
+                        buffer += line
+                        continue
+                    buffer = ''
                     tokens = tokenize_tweet(tknzr, stopwords, tweet)
                     data_as_tokens.append((tokens, label))
                     all_tokens += tokens
                 # raise when a multiline tweet in encountered
                 except ValueError:
-                    buffer = line
+                    buffer += line
 
     print('totally', len(all_tokens), 'tokens of interest in the corpus')
 

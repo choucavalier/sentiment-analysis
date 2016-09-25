@@ -47,7 +47,7 @@ A vocabulary and a trained model are included in the repository, so you can simp
 
 Example:
 
-```
+```python
 $ python predict.py
 tweet > i really love the idea of flying
 positive
