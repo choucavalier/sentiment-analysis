@@ -3,7 +3,7 @@ import pickle
 import random
 
 import numpy as np
-from sklearn.naive_bayes import GaussianNB
+from sklearn import naive_bayes
 from sklearn import metrics
 
 label_to_int = {
@@ -61,7 +61,7 @@ def main():
     x_test = x[n_training_samples:]
     y_test = y[n_training_samples:]
 
-    model = GaussianNB()
+    model = naive_bayes.MultinomialNB()
 
     model.fit(x_train, y_train)
 
