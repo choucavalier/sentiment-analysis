@@ -7,7 +7,7 @@ for classifying tweets in `[neutral, positive, negative]`.
 
 Before being being able to run the code, you'll have to insall a few dependencies.
 
-### Virtual Environment (with `pyenv`)
+##### Virtual Environment (with `pyenv`)
 
 *If you already know about this, you should skip it.*
 
@@ -22,7 +22,7 @@ I like **pyenv** so here is how to do it with it:
 5. `pyenv activate tweet-sentiment` to activate the virtualenv
 6. `pip install --upgrade pip setuptools` just to make sure you have the last versions of `pip` and `setuptools`
 
-### Dependencies
+##### Dependencies
 
 - To install all the modules necessary, simply run
   ```
@@ -41,6 +41,8 @@ I like **pyenv** so here is how to do it with it:
 
 ## Usage
 
+### Test the model
+
 A vocabulary and a trained model are included in the repository, so you can simply run `predict.py` to test the model on manually typed sentences.
 
 Example:
@@ -54,10 +56,12 @@ tweet > i spent 3 hours in the line before they told
 negative
 ```
 
+### Train a new model
+
 To extract a vocabulary and features from the raw dataset, use `preprocess.py`. This script uses `pickle` to persist both in `vocabulary.pickle` and `data.pickle`. If the size of the vocabulary (set by `VOCABULARY_SIZE` in `preprocess.py`) is very large, `data.pickle` can reach a few GBs because of the increased size of the feature vector extracted for each data point (which has the size of the vocabulary).
 
 Example:
-```
+```python
 $ python preprocess.py 
 ... generating vocabulary
 totally 295434 tokens of interest in the corpus
@@ -69,9 +73,9 @@ vocabulary saved in ./vocalubary.pickle
 preprocessed data saved in ./data.pickle
 ```
 
-`train.py` is used to train a model based on `vocabulary.pickle` with the extracted features saved in `data.pickle`.
+`train.py` is used to train a model based on `vocabulary.pickle` with the extracted features saved by `preprocess.py` in `data.pickle`.
 
-```
+```python
 $ python train.py 
 ... training model
 18254 samples used for training

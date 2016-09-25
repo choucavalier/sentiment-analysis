@@ -61,7 +61,10 @@ def main():
     x_test = x[n_training_samples:]
     y_test = y[n_training_samples:]
 
-    model = naive_bayes.MultinomialNB()
+    # hardcoded prior probabilities
+    priors = np.array([0.4, 0.3, 0.3])
+
+    model = naive_bayes.MultinomialNB(class_prior=priors)
 
     print('... training model')
     print(x_train.shape[0], 'samples used for training')
