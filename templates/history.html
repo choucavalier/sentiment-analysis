@@ -1,0 +1,53 @@
+<!doctype html>
+<head>
+    <title>history of classified tweets</title>
+
+<style>
+
+body {
+    background: #e3e3e3;
+    padding: 50px;
+    font-family: Helvetica, sans-serif;
+}
+
+#wrapper {
+    width: 500px;
+    margin: 0 auto;
+}
+
+#wrapper h1 {
+}
+
+#tweets {
+    width: 100%;
+    text-align: left;
+}
+
+#tweets th {
+    background: #d3d3d3;
+}
+
+</style>
+</head>
+<body>
+
+    <div id="wrapper">
+        <h1>10 most recent tweets classified</h1>
+
+        <table id="tweets" border="0">
+
+            <tr>
+                <th>tweet content</th>
+                <th>label</th>
+            </tr>
+
+            {% for tweet, label in history %}
+            <tr>
+                <td>{{ tweet }}</td>
+                <td>{{ label }}</td>
+            </tr>
+            {% endfor %}
+
+        </table>
+    </div>
+</body>

@@ -13,8 +13,8 @@ import random
 import numpy as np
 from sklearn import cross_validation
 from sklearn import naive_bayes
+from sklearn import linear_model
 from sklearn import metrics
-
 
 def main():
 
@@ -52,9 +52,10 @@ def main():
     y_test = y[n_training_samples:]
 
     # hardcoded prior probabilities
-    priors = np.array([0.5, 0.25, 0.25])
+    # priors = np.array([0.5, 0.25, 0.25])
 
-    model = naive_bayes.MultinomialNB(class_prior=priors)
+    # model = naive_bayes.MultinomialNB(class_prior=priors)
+    model = linear_model.LogisticRegression()
 
     print('... fitting model')
 
