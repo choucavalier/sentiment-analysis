@@ -14,7 +14,9 @@ import numpy as np
 from sklearn import cross_validation
 from sklearn import naive_bayes
 from sklearn import metrics
-
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
+from sklearn.utils import shuffle
+from gensim.models import doc2vec
 
 def main():
 
@@ -25,24 +27,18 @@ def main():
         'negative': 2,
     }
 
-    # load the preprocessed data (see preprocess.py)
+    # load preprocessed data with shape (n_samples, DOC2VEC_SIZE)
     with open('data.pickle', 'rb') as f:
-        data = pickle.load(f)
+        x = pickle.load(f)
 
-    cleaned_data = []
+    # load labels
+    with open('labels.pickle', 'rb') as f:
+        y = pickle.load(f)
 
-    # shuffling the data
-    random.shuffle(data)
+    n_samples, n_features = x.shape # for code clarity
 
-    n_samples = len(data)
-    n_features = data[0][0].shape[0]
-
-    # create ndarrays from preprocessed data
-    x = np.ndarray(shape=(n_samples, n_features))
-    y = np.ndarray(shape=(n_samples,), dtype=int)
-    for i, datum in enumerate(data):
-        x[i] = datum[0]
-        y[i] = label_to_int[datum[1]]
+    # shuffle x and y the same way
+    x, y = shuffle(x, y, random_state=0)
 
     # splitting the dataset into train/test
     n_training_samples = 2 * n_samples // 3
@@ -54,7 +50,7 @@ def main():
     # hardcoded prior probabilities
     priors = np.array([0.5, 0.25, 0.25])
 
-    model = naive_bayes.MultinomialNB(class_prior=priors)
+    model = LDA()
 
     print('... fitting model')
 

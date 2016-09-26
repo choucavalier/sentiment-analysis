@@ -43,8 +43,6 @@ I like **pyenv** so here is how to do it with it:
 
 ### Test the model
 
-A vocabulary and a trained model are included in the repository, so you can simply run `predict.py` to test the model on manually typed sentences.
-
 Example:
 
 ```python
@@ -62,11 +60,11 @@ To extract a vocabulary and features from the raw dataset, use `preprocess.py`. 
 
 Example:
 ```python
-$ python preprocess.py 
+$ python preprocess.py
 ... generating vocabulary
 totally 295434 tokens of interest in the corpus
 vocabulary size: 2000
-10 most common words: ['sxsw', 'apple', 'mention', 'link', 'united', 
+10 most common words: ['sxsw', 'apple', 'mention', 'link', 'united',
                        'rt', 'flight', 'co', 'usairways', 'americanair']
 vocabulary saved in ./vocalubary.pickle
 ... extracting features
@@ -76,7 +74,7 @@ preprocessed data saved in ./data.pickle
 `train.py` is used to train a model based on `vocabulary.pickle` with the extracted features saved by `preprocess.py` in `data.pickle`.
 
 ```python
-$ python train.py 
+$ python train.py
 ... training model
 18254 samples used for training
 model MultinomialNB trained

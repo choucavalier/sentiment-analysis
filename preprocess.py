@@ -14,12 +14,13 @@ This module:
 Both the vocabulary and extracted features are persisted with pickle
 '''
 import pickle
+import random
 
 import numpy as np
 import nltk
 from gensim.models import doc2vec
 
-VOCABULARY_SIZE = 2000
+DOC2VEC_SIZE = 100
 
 def tokenize_tweet(tknzr, stopwords, tweet: str):
     tweet = tweet.replace('\n', '').strip('"').rstrip('"')
@@ -31,6 +32,13 @@ def tokenize_tweet(tknzr, stopwords, tweet: str):
     return tokens
 
 def main():
+
+    # dict used to convert string labels to integers
+    label_to_int = {
+        'neutral': 0,
+        'positive': 1,
+        'negative': 2,
+    }
 
     # word tokenizer
     tknzr = nltk.tokenize.RegexpTokenizer(r'\w+')
@@ -50,6 +58,9 @@ def main():
 
     # list of (tokens, label) for each tweet
     data_as_tagged_documents = []
+    labels = []
+
+    count = 0
 
     for dataset_path in datasets:
         with open(dataset_path, encoding='utf-8') as raw_file:
@@ -69,16 +80,47 @@ def main():
                     buffer = ''
                     tokens = tokenize_tweet(tknzr, stopwords, tweet)
                     tagged_document = doc2vec.TaggedDocument(words=tokens,
-                                                             tags=[label])
+                                                             tags=[count])
                     data_as_tagged_documents.append(tagged_document)
+                    labels.append(label_to_int[label])
+                    count += 1
                 # raise when a multiline tweet in encountered
                 except ValueError:
                     buffer += line
 
-    model = doc2vec.Doc2Vec(data_as_tagged_documents, size=100, min_count=10,
-                            workers=16)
+    model = doc2vec.Doc2Vec(size=DOC2VEC_SIZE, min_count=10, workers=16)
+
+    random.shuffle(data_as_tagged_documents)
+
+    model.build_vocab(data_as_tagged_documents)
+
+    for epoch in range(10):
+        random.shuffle(data_as_tagged_documents)
+        model.train(data_as_tagged_documents)
+
+    n_samples = len(data_as_tagged_documents)
+    n_features = DOC2VEC_SIZE
+
+    print('constructed {} vectors of size {}'.format(n_samples, n_features))
+
+    x = np.zeros((n_samples, n_features), dtype=np.float)
+    y = np.zeros((n_samples,), dtype=np.int)
+
+    for i in range(x.shape[0]):
+        x[i] = model.docvecs[i]
+        y[i] = labels[i]
+
+    with open('labels.pickle', 'wb') as f:
+        pickle.dump(y, f)
+        print('labels saved in labels.pickle')
+
+    with open('data.pickle', 'wb') as f:
+        pickle.dump(x, f)
+        print('data saved in data.pickle')
 
     model.save('model.d2v')
+
+    print('d2v model saved in model.d2v')
 
 if __name__ == '__main__':
     main()
