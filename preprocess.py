@@ -17,6 +17,7 @@ import pickle
 
 import numpy as np
 import nltk
+from gensim.models import doc2vec
 
 VOCABULARY_SIZE = 2000
 
@@ -45,12 +46,10 @@ def main():
         'raw_data/test/test_products.csv',
     ]
 
-    print('... generating vocabulary')
+    print('... calculating document vectors')
 
-    # all filtered tokens appearing in the dataset (with repetition)
-    all_tokens = []
     # list of (tokens, label) for each tweet
-    data_as_tokens = []
+    data_as_tagged_documents = []
 
     for dataset_path in datasets:
         with open(dataset_path, encoding='utf-8') as raw_file:
@@ -69,46 +68,17 @@ def main():
                         continue
                     buffer = ''
                     tokens = tokenize_tweet(tknzr, stopwords, tweet)
-                    data_as_tokens.append((tokens, label))
-                    all_tokens += tokens
+                    tagged_document = doc2vec.TaggedDocument(words=tokens,
+                                                             tags=[label])
+                    data_as_tagged_documents.append(tagged_document)
                 # raise when a multiline tweet in encountered
                 except ValueError:
                     buffer += line
 
-    print('totally', len(all_tokens), 'tokens of interest in the corpus')
+    model = doc2vec.Doc2Vec(data_as_tagged_documents, size=100, min_count=10,
+                            workers=16)
 
-    # calculate frequency of each token in the corpus
-    dist = nltk.FreqDist(all_tokens)
-
-    # most common tokens in the corpus
-    vocabulary = list([w for w, f in dist.most_common(VOCABULARY_SIZE)])
-
-    print('vocabulary size:', VOCABULARY_SIZE)
-    print('10 most common words:', list([w for w, f in dist.most_common(10)]))
-
-    # persist vocabulary (feature set)
-    with open('vocabulary.pickle', 'wb') as f:
-        pickle.dump(vocabulary, f)
-        print('vocabulary saved in', './vocalubary.pickle')
-
-    print('... extracting features')
-
-    # (features, label) for each datum
-    data = []
-
-    # extract features for each datum
-    for tokens, label in data_as_tokens:
-        # initialize a numpy array the size of the vocabulary
-        features = np.zeros(len(vocabulary), dtype=np.bool)
-        for i, token in enumerate(vocabulary):
-            features[i] = (token in tokens)
-        data.append((features, label))
-
-    # persist preprocessed dataset ((features, label))
-    with open('data.pickle', 'wb') as f:
-        pickle.dump(data, f)
-
-    print('preprocessed data saved in', './data.pickle')
+    model.save('model.d2v')
 
 if __name__ == '__main__':
     main()
