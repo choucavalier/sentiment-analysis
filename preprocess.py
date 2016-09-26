@@ -18,7 +18,7 @@ import pickle
 import numpy as np
 import nltk
 
-VOCABULARY_SIZE = 4000
+VOCABULARY_SIZE = 2000
 
 def tokenize_tweet(tknzr, stopwords, tweet: str):
     tweet = tweet.replace('\n', '').strip('"').rstrip('"')

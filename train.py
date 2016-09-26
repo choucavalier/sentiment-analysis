@@ -56,8 +56,6 @@ def main():
 
     model = naive_bayes.MultinomialNB(class_prior=priors)
 
-    print(x_train.shape[0], 'samples used for training/validation')
-
     print('... fitting model')
 
     model.fit(x_train, y_train)
