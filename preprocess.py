@@ -88,7 +88,8 @@ def main():
                 except ValueError:
                     buffer += line
 
-    model = doc2vec.Doc2Vec(size=DOC2VEC_SIZE, min_count=10, workers=16)
+    model = doc2vec.Doc2Vec(size=DOC2VEC_SIZE, min_count=5, workers=16,
+                            window=10, sample=1e-4, negative=5)
 
     random.shuffle(data_as_tagged_documents)
 
