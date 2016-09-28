@@ -1,7 +1,8 @@
 # Multinomial Naive Bayes Classifier for Tweet Sentiment Analysis
 
 This code uses [`sklearn.naive_bayes.MultinomialNB`](http://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.MultinomialNB.html)
-for classifying tweets in `[neutral, positive, negative]`.
+for classifying tweets in `[neutral, positive, negative]` with a **72%**
+accuracy (on testing set).
 
 ## Installation
 
@@ -62,11 +63,11 @@ To extract a vocabulary and features from the raw dataset, use `preprocess.py`. 
 
 Example:
 ```python
-# python preprocess.py 
+# python preprocess.py
 ... generating vocabulary
 totally 295434 tokens of interest in the corpus
 vocabulary size: 2000
-10 most common words: ['sxsw', 'apple', 'mention', 'link', 'united', 
+10 most common words: ['sxsw', 'apple', 'mention', 'link', 'united',
                        'rt', 'flight', 'co', 'usairways', 'americanair']
 vocabulary saved in ./vocalubary.pickle
 ... extracting features
