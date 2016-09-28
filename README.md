@@ -48,7 +48,7 @@ A vocabulary and a trained model are included in the repository, so you can simp
 Example:
 
 ```python
-$ python predict.py
+# python predict.py
 tweet > i really love the idea of flying
 positive
 tweet > i spent 3 hours in the line before they told
@@ -62,7 +62,7 @@ To extract a vocabulary and features from the raw dataset, use `preprocess.py`. 
 
 Example:
 ```python
-$ python preprocess.py 
+# python preprocess.py 
 ... generating vocabulary
 totally 295434 tokens of interest in the corpus
 vocabulary size: 2000
@@ -76,29 +76,31 @@ preprocessed data saved in ./data.pickle
 `train.py` is used to train a model based on `vocabulary.pickle` with the extracted features saved by `preprocess.py` in `data.pickle`.
 
 ```python
-$ python train.py 
-... training model
-18254 samples used for training
-model MultinomialNB trained
-... evaluating model
+# python train.py
+... fitting model
+done
+... cross validition
+accuracy: 0.7386869847861981 (+/- 0.01704924192292243)
+... testing model
 9127 samples used for testing
 ......................................................................
 classification report
              precision    recall  f1-score   support
 
-          0       0.72      0.60      0.66      3607
-          1       0.57      0.49      0.53      1924
-          2       0.70      0.87      0.78      3596
+          0       0.68      0.74      0.71      3569
+          1       0.64      0.50      0.56      1943
+          2       0.80      0.82      0.81      3615
 
-avg / total       0.68      0.69      0.68      9127
+avg / total       0.72      0.72      0.72      9127
 
 ......................................................................
 confusion matrix
-[[2182  558  867]
- [ 521  937  466]
- [ 321  139 3136]]
+[[2651  399  519]
+ [ 739  981  223]
+ [ 487  153 2975]]
 ......................................................................
 model saved in ./model.pickle
+
 ```
 
 ## About
@@ -108,10 +110,20 @@ model saved in ./model.pickle
 The dataset contains around **27K** tweets retrieved from
 [Twitter](http://twitter.com) with user comments about airline companies and products, some containing positive and negative feedbacks.
 
+- 10650 neutral
+- 5764 positive
+- 10967 negative
+
 ### Choice of the model
 
-### Preprocessing the data
+A "vocabulary" is constructed with the **2000** most frequent words in the whole corpus.
 
-### Training
+Each sample `x` is represented as a `bool` array the size of the vocabulary indiciating whether it contains the words of the vocabulary or not.
 
-### API
+The feature space can be viewed as a 2000 dimensional unit hypersphere, where each word of the vocabulary is a demension.
+
+A `LogisticClassifier` is trained on the preprocessed data. It learns how to partition the feature space between the 3 classes.
+
+The trained `LogisticClassifier` can be used to classify new inputs.
+
+![classification diagram](gfx/classification.svg)
