@@ -126,4 +126,4 @@ A `LogisticClassifier` is trained on the preprocessed data. It learns how to par
 
 The trained `LogisticClassifier` can be used to classify new inputs.
 
-![classification diagram](gfx/classification.svg)
+![classification diagram](gfx/classification.png)
